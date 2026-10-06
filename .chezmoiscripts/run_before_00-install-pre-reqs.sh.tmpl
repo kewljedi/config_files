@@ -1,0 +1,53 @@
+#!/bin/bash
+#curl and zsh are installed by default on darwin
+https://www.chezmoi.io/user-guide/machines/linux/#combine-operating-system-and-linux-distribution-conditionals
+{{ if eq .chezmoi.os "linux" }}
+echo "Install for linux"
+{{ if eq .chezmoi.osRelease.id "debian" }}
+echo "debian"
+apt install zsh -y
+apt install curl -y
+apt install zip -y
+apt install ghostty -y #
+{{ else if eq .chezmoi.osRelease.id "fedora" }}
+echo "fedora"
+sudo rpm-ostree install zsh 
+rpm-ostree install curl
+rpm-ostree install zip
+
+#ghostty is in a different repo
+. /etc/os-release
+curl -fsSL "https://copr.fedorainfracloud.org/coprs/scottames/ghostty/repo/fedora-${VERSION_ID}/scottames-ghostty-fedora-${VERSION_ID}.repo" | sudo tee /etc/yum.repos.d/_copr:copr.fedorainfracloud.org:scottames:ghostty.repo > /dev/null
+rpm-ostree refresh-md && rpm-ostree install ghostty
+
+rpm-ostree ex apply-live # this should make the installs show up to this deployment
+{{ end }} 
+
+echo "Setup shell"
+sudo usermod --shell /bin/zsh $USER
+
+{{ end }}
+
+echo "Download Oh My Zsh"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+echo "Download powerevel 10k"
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+
+echo "download fonts"
+mkdir -p /tmp/font
+curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/MartianMono.zip -o /tmp/font/font.zip
+unzip /tmp/font/font.zip
+
+{{ if eq .chezmoi.os "linux" }}
+echo "install linux fonts"
+mkdir -p ~/.local/share/fonts
+cp /tmp/font/*.ttf ~/.local.share/fonts
+fc-cache -f -v
+{{ end }}
+
+{{ if eq .chezmoi.os "darwin" }}
+echo "install darwin fonts"
+mkdir -p ~/Library/Fonts
+cp /tmp/font/*.tff ~/Library/Fonts/
+{{ end }}
