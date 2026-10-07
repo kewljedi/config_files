@@ -11,7 +11,8 @@ apt install zip -y
 apt install ghostty -y #
 {{ else if eq .chezmoi.osRelease.id "fedora" }}
 echo "fedora"
-sudo rpm-ostree install zsh 
+rpm-ostree install zsh 
+rpm-ostree install tmux
 rpm-ostree install curl
 rpm-ostree install zip
 
@@ -31,13 +32,15 @@ sudo usermod --shell /bin/zsh $USER
 echo "Download Oh My Zsh"
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
+curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh
+
 echo "Download powerevel 10k"
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 
 echo "download fonts"
 mkdir -p /tmp/font
 curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/MartianMono.zip -o /tmp/font/font.zip
-unzip /tmp/font/font.zip
+unzip /tmp/font/font.zip -d /tmp/font/
 
 {{ if eq .chezmoi.os "linux" }}
 echo "install linux fonts"
