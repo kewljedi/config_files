@@ -1,0 +1,120 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 34,
+  "spacing": 8,
+
+  "modules-left": [
+    "sway/workspaces",
+    "sway/mode",
+  ],
+
+  "modules-center": [
+    "clock"
+  ],
+
+  "modules-right": [
+    "idle_inhibitor",
+    "keyboard-state",
+    "custom/toolbox",
+    "cpu",
+    "memory",
+    "temperature",
+    "network",
+    "pulseaudio",
+    "battery",
+    "tray"
+  ],
+
+  "sway/workspaces": {
+    "disable-scroll": false,
+    "all-outputs": true,
+    "format": "{icon}",
+    "format-icons": {
+      "1": "",
+      "2": "",
+      "3": "",
+      "4": "",
+      "5": "",
+      "urgent": "",
+      "focused": "",
+      "default": ""
+    }
+  },
+
+  "keyboard-state": {
+    "numlock": true,
+    "capslock": true,
+    "format": {
+        "numlock": "N {icon}",
+        "capslock": "C {icon}"                                                                                                                                                       
+    },
+    "format-icons": {
+        "locked": "",
+        "unlocked": ""
+    }
+  },
+
+
+  "idle_inhibitor": {
+    "format": "{icon}",
+    "format-icons": {
+        "activated": "",
+        "deactivated": ""
+    }
+  },
+
+  "clock": {
+    "format": " {:%I:%M %p}",
+    "tooltip-format": "{:%A, %d %B %Y}"
+  },
+
+  "cpu": {
+    "format": " {usage}%",
+    "interval": 2
+  },
+
+  "memory": {
+    "format": " {}%"
+  },
+
+  "temperature": {
+    "format": " {temperatureF}°F",
+    "critical-threshold": 80
+  },
+
+  "network": {
+    "format-wifi": "  {essid}",
+    "format-ethernet": "󰈀 Connected",
+    "format-disconnected": "󰤭 Offline",
+    "tooltip-format": "{ipaddr}"
+  },
+
+  "pulseaudio": {
+    "format": "{icon} {volume}%",
+    "format-muted": "󰝟 Muted",
+    "format-icons": {
+      "default": ["", "", ""]
+    },
+    "on-click": "pavucontrol"
+  },
+
+  "battery": {
+    "format": "{icon} {capacity}%",
+    "format-charging": "󰂄 {capacity}%",
+    "format-icons": ["󰁺","󰁻","󰁼","󰁽","󰁾","󰁿","󰂀","󰂁","󰂂","󰁹"],
+    "states": {
+      "warning": 30,
+      "critical": 15
+    }
+  },
+
+  "tray": {
+    "spacing": 10
+  },
+
+  "custom/toolbox": {
+    "exec": "test -f /run/.toolboxenv && echo '󰆍 Toolbox'",
+    "interval": 5
+  }
+}
