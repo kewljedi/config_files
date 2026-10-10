@@ -1,40 +1,44 @@
 #!/bin/bash
 #curl and zsh are installed by default on darwin
-https://www.chezmoi.io/user-guide/machines/linux/#combine-operating-system-and-linux-distribution-conditionals
-{{ if eq .chezmoi.os "linux" }}
-echo "Install for linux"
-{{ if eq .chezmoi.osRelease.id "debian" }}
-echo "debian"
-apt install zsh -y
-apt install curl -y
-apt install zip -y
-apt install ghostty -y #
-{{ else if eq .chezmoi.osRelease.id "fedora" }}
-echo "fedora"
-rpm-ostree install zsh 
-rpm-ostree install tmux
-rpm-ostree install curl
-rpm-ostree install zip
+#https://www.chezmoi.io/user-guide/machines/linux/#combine-operating-system-and-linux-distribution-conditionals
+{{- if eq .chezmoi.os "linux" -}}
+    echo "Install for linux"
 
-#ghostty is in a different repo
-. /etc/os-release
-curl -fsSL "https://copr.fedorainfracloud.org/coprs/scottames/ghostty/repo/fedora-${VERSION_ID}/scottames-ghostty-fedora-${VERSION_ID}.repo" | sudo tee /etc/yum.repos.d/_copr:copr.fedorainfracloud.org:scottames:ghostty.repo > /dev/null
-rpm-ostree refresh-md && rpm-ostree install ghostty
+    {{- if or (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.osRelease.id "debian") -}}
 
-rpm-ostree ex apply-live # this should make the installs show up to this deployment
-{{ end }} 
+        echo "debian"
+        sudo apt install zsh -y
+        sudo apt install curl -y
+        sudo apt install zip -y
+        sudo apt install ghostty -y 
+    {{- else if eq .chezmoi.osRelease.id "fedora" -}}
 
-echo "Setup shell"
-sudo usermod --shell /bin/zsh $USER
+        echo "fedora"
+        rpm-ostree install zsh 
+        rpm-ostree install tmux
+        rpm-ostree install curl
+        rpm-ostree install zip
 
-{{ end }}
+        #ghostty is in a different repo
+        . /etc/os-release
+        curl -fsSL "https://copr.fedorainfracloud.org/coprs/scottames/ghostty/repo/fedora-${VERSION_ID}/scottames-ghostty-fedora-${VERSION_ID}.repo" | sudo tee /etc/yum.repos.d/_copr:copr.fedorainfracloud.org:scottames:ghostty.repo > /dev/null
+        rpm-ostree refresh-md && rpm-ostree install ghostty
+
+        rpm-ostree ex apply-live # this should make the installs show up to this deployment
+
+    {{- end -}} 
+
+    echo "Setup shell"
+    sudo usermod --shell /bin/zsh $USER
+
+{{- end -}}
 
 echo "Download Oh My Zsh"
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
 curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh
 
-echo "Download powerevel 10k"
+echo "Download powerlevel 10k"
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 
 echo "download fonts"
