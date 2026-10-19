@@ -204,4 +204,7 @@ brx() { # run on x86_64
   bazel run --config=x86_64 "$target" "$@"
 }
 
-export PATH="$HOME/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+. "$HOME/.cargo/env"
+export $XDG_CONFIG_HOME=~/.config
+alias bat="batcat"
