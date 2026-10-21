@@ -1,0 +1,6 @@
+brew  "curl"
+brew "zip"
+cask "ghostty"
+brew "bat"
+brew "fzf"
+brew "lazygit"

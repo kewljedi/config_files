@@ -1,4 +1,51 @@
 #!/bin/bash
+
+function check_install_ubuntu() {
+    package=$1
+
+    dpkg-query -W -f='${Status}\n' $$package 2>/dev/null | grep -q "ok installed"
+    if [ $? -ne -0 ]; then 
+        sudo apt install $package -y
+        if [  $? == 0 ]; then 
+            echo "📦 $package installed"
+        else 
+            echo "❌ Error: $package not installed."
+        fi 
+    else 
+        echo "✅ $package exists"
+    fi
+}
+
+function check_install_darwin() {
+    if ! command -v brew &> /dev/null; then
+        echo "⏳ Homebrew not found. Installing Homebrew..."
+        
+        # Run the official Homebrew installation script
+        /bin/bash -c "$(curl -fsSL https://githubusercontent.com)"
+        
+        # Set up the environment paths immediately for the rest of this script
+        # This ensures 'brew' works on both Intel and Apple Silicon Macs right away
+        if [[ "$(uname -m)" == "arm64" ]]; then
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+        else
+            eval "$(/usr/local/bin/brew shellenv)"
+        fi
+    else
+        echo "✅ Homebrew is already installed."
+    fi
+
+    brewfile="$(chezmoi source-path)/Brewfile"
+    if [ -f "$brewfile" ]; then
+        echo "📦 Installing/Checking apps from Brewfile..."
+        brew bundle --file "$brewfile" 
+        echo "🎉 All packages and casks are up to date!"
+    else
+        echo "❌ Error: Brewfile not found in the current directory."
+    fi
+
+    echo "🎉 All done! Homebrew and all packages are ready."
+}
+
 #curl and zsh are installed by default on darwin
 #https://www.chezmoi.io/user-guide/machines/linux/#combine-operating-system-and-linux-distribution-conditionals
 {{- if eq .chezmoi.os "linux" -}}
@@ -6,14 +53,14 @@
 
     {{- if or (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.osRelease.id "debian") -}}
 
-        echo "debian"
-        sudo apt install zsh -y
-        sudo apt install curl -y
-        sudo apt install zip -y
-        sudo apt install ghostty -y 
-        sudo apt install bat -y
-        sudo apt install fzf -y
-        sudo apt install lazygit -y
+        echo "debian apt based"
+        check_install_ubuntu zsh
+        check_install_ubuntu curl
+        check_install_ubuntu zip
+        check_install_ubuntu ghostty
+        check_install_ubuntu bat
+        check_install_ubuntu fzf
+        check_install_ubuntu lazygit
     {{- else if eq .chezmoi.osRelease.id "fedora" -}}
 
         echo "fedora"
@@ -40,12 +87,7 @@
     echo "Setup shell"
     sudo usermod --shell /bin/zsh $USER
 {{- else if eq .chezmoi.osRelease.id "darwin" -}}
-    brew install curl
-    brew install zip
-    brew install --cask ghostty
-    brew install bat
-    brew install fzf
-    brew install lazygit
+    check_install_darwin
 {{- end -}}
 
 #basalt https://basalt.page/
@@ -83,14 +125,14 @@ curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Martian
 unzip /tmp/font/font.zip -d /tmp/font/
 
 {{ if eq .chezmoi.os "linux" }}
-echo "install linux fonts"
-mkdir -p ~/.local/share/fonts
-cp /tmp/font/*.ttf ~/.local.share/fonts
-fc-cache -f -v
+    echo "install linux fonts"
+    mkdir -p ~/.local/share/fonts
+    cp /tmp/font/*.ttf ~/.local.share/fonts
+    fc-cache -f -v
 {{ end }}
 
 {{ if eq .chezmoi.os "darwin" }}
-echo "install darwin fonts"
-mkdir -p ~/Library/Fonts
-cp /tmp/font/*.tff ~/Library/Fonts/
+    echo "install darwin fonts"
+    mkdir -p ~/Library/Fonts
+    cp /tmp/font/*.tff ~/Library/Fonts/
 {{ end }}
