@@ -4,9 +4,9 @@ function check_install_ubuntu() {
     package=$1
 
     dpkg-query -W -f='${Status}\n' $$package 2>/dev/null | grep -q "ok installed"
-    if [ $? -ne -0 ]; then 
-        sudo apt install $package -y
-        if [  $? == 0 ]; then 
+    if [ $? -ne 0 ]; then 
+        sudo apt install $package -y  &> /dev/null
+        if [  $? -eq 0 ]; then 
             echo "📦 $package installed"
         else 
             echo "❌ Error: $package not installed."
