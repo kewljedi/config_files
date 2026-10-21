@@ -1,12 +1,12 @@
 #!/bin/bash
 
 function check_install_ubuntu() {
-    package=$1
+    package="$1"
 
-    dpkg-query -W -f='${Status}\n' $$package 2>/dev/null | grep -q "ok installed"
-    if [ $? -ne 0 ]; then 
+    dpkg-query -W -f='${Status}\n' $package 2>/dev/null | grep -q "ok installed"
+    if [ "$?" -ne "0" ]; then 
         sudo apt install $package -y  &> /dev/null
-        if [  $? -eq 0 ]; then 
+        if [  "$?" -eq "0" ]; then 
             echo "📦 $package installed"
         else 
             echo "❌ Error: $package not installed."
@@ -53,14 +53,16 @@ function check_install_darwin() {
 
     {{- if or (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.osRelease.id "debian") -}}
 
-        echo "debian apt based"
+        echo "debian apt based package installs"
         check_install_ubuntu zsh
+        check_install_ubuntu tmux
         check_install_ubuntu curl
         check_install_ubuntu zip
         check_install_ubuntu ghostty
         check_install_ubuntu bat
         check_install_ubuntu fzf
         check_install_ubuntu lazygit
+
     {{- else if eq .chezmoi.osRelease.id "fedora" -}}
 
         echo "fedora"
@@ -84,11 +86,13 @@ function check_install_darwin() {
 
     {{- end -}} 
 
-    echo "Setup shell"
-    sudo usermod --shell /bin/zsh $USER
 {{- else if eq .chezmoi.osRelease.id "darwin" -}}
+    # all packages that need to be installed should be put in the Brew file in $(chezmoi source-path).
     check_install_darwin
 {{- end -}}
+
+echo "Setup shell"
+sudo usermod --shell /bin/zsh $USER
 
 #basalt https://basalt.page/
 cargo install basalt-tui
@@ -97,29 +101,28 @@ cargo install basalt-tui
 curl -sfL https://raw.githubusercontent.com/paulilaaso/bit/main/install.sh | sh
 
 
-echo "Download Oh My Zsh"
-if [ -d "~/.oh-my-zsh" ]; then
-    echo "~/.oh-my-zsh exists, skipping install"
+if [ -d "$HOME/.oh-my-zsh" ]; then
+    echo "✅ ~/.oh-my-zsh exists"
 else
-    echo "downloading oh-my-zsh"
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    echo "⏳ downloading oh-my-zsh"
+    #sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 fi
 
-if [ -d "~/.zplug" ]; then
-    echo "~/.zplug exits, skipping install"
+if [ -d "$HOME/.zplug" ]; then
+    echo "✅ ~/.zplug exits, skipping install"
 else
-    echo "downloading zplug"
+    echo "⏳ downloading zplug"
     curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh
 fi
 
-if [ -d "~/powerlevel10k"]; then
-    echo "~/powerlevel10k exists, skipping install"
+if [ -d "$HOME/powerlevel10k" ]; then
+    echo "✅ ~/powerlevel10k exists, skipping install"
 else
-    echo "Download powerlevel 10k"
+    echo "⏳ downloading powerlevel 10k"
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 fi
 
-echo "download fonts"
+echo "⏳ download fonts"
 mkdir -p /tmp/font
 curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/MartianMono.zip -o /tmp/font/font.zip
 unzip /tmp/font/font.zip -d /tmp/font/
@@ -127,7 +130,7 @@ unzip /tmp/font/font.zip -d /tmp/font/
 {{ if eq .chezmoi.os "linux" }}
     echo "install linux fonts"
     mkdir -p ~/.local/share/fonts
-    cp /tmp/font/*.ttf ~/.local.share/fonts
+    cp /tmp/font/*.ttf ~/.local/share/fonts
     fc-cache -f -v
 {{ end }}
 

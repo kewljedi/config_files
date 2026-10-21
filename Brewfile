@@ -1,4 +1,5 @@
-brew  "curl"
+brew "curl"
+brew "tmux"
 brew "zip"
 cask "ghostty"
 brew "bat"
