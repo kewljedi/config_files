@@ -46,6 +46,37 @@ function check_install_darwin() {
     echo "🎉 All done! Homebrew and all packages are ready."
 }
 
+function dl_font() {
+    font_url="$1"
+
+    mkdir -p /tmp/font
+    curl -L $font_url -o /tmp/font/font.zip
+    unzip /tmp/font/font.zip -d /tmp/font/
+
+}
+
+function install_fonts() {
+    {{ if eq .chezmoi.os "linux" }}
+        fontdir="$HOME/.local/share/fonts"
+    {{ end }}
+
+    {{ if eq .chezmoi.os "darwin" }}
+        fontdir="$HOME/Library/Fonts"
+    {{ end }}
+
+    mkdir -p "$fontdir"
+    cd "$fontdir"
+    find . -type f -printf "✅ found %f\n" -exec rm -f /tmp/font/{} \;
+    find /tmp/font -maxdepth 1 -type f \( -name "*.ttf" -o -name "*.otf" -o -name "*.ttc" -o -name "*.otc" \) -exec cp {} $HOME/.local/share/fonts \; -printf "📦 Installing %f\n"
+    cd - 
+    rm -rf "/tmp/font"
+
+    {{ if eq .chezmoi.os "linux" }}
+        echo "⏳ Updating font cache (this may take a moment)"
+        fc-cache -f
+    {{ end }}
+}
+
 #curl and zsh are installed by default on darwin
 #https://www.chezmoi.io/user-guide/machines/linux/#combine-operating-system-and-linux-distribution-conditionals
 {{- if eq .chezmoi.os "linux" -}}
@@ -123,19 +154,7 @@ else
 fi
 
 echo "⏳ download fonts"
-mkdir -p /tmp/font
-curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/MartianMono.zip -o /tmp/font/font.zip
-unzip /tmp/font/font.zip -d /tmp/font/
+#for each font you want to install dl_font, you only need to run install_fonts once
+dl_font "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/MartianMono.zip"
+install_fonts
 
-{{ if eq .chezmoi.os "linux" }}
-    echo "install linux fonts"
-    mkdir -p ~/.local/share/fonts
-    cp /tmp/font/*.ttf ~/.local/share/fonts
-    fc-cache -f -v
-{{ end }}
-
-{{ if eq .chezmoi.os "darwin" }}
-    echo "install darwin fonts"
-    mkdir -p ~/Library/Fonts
-    cp /tmp/font/*.tff ~/Library/Fonts/
-{{ end }}
