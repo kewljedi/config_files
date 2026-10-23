@@ -50,8 +50,8 @@ function dl_font() {
     font_url="$1"
 
     mkdir -p /tmp/font
-    curl -L $font_url -o /tmp/font/font.zip
-    unzip /tmp/font/font.zip -d /tmp/font/
+    curl -LsS $font_url -o /tmp/font/font.zip
+    unzip -qq /tmp/font/font.zip -d /tmp/font/
 
 }
 
@@ -68,7 +68,7 @@ function install_fonts() {
     cd "$fontdir"
     find . -type f -printf "✅ found %f\n" -exec rm -f /tmp/font/{} \;
     find /tmp/font -maxdepth 1 -type f \( -name "*.ttf" -o -name "*.otf" -o -name "*.ttc" -o -name "*.otc" \) -exec cp {} $HOME/.local/share/fonts \; -printf "📦 Installing %f\n"
-    cd - 
+    cd - > /dev/null
     rm -rf "/tmp/font"
 
     {{ if eq .chezmoi.os "linux" }}
