@@ -34,7 +34,7 @@ function check_install_darwin() {
         echo "✅ Homebrew is already installed."
     fi
 
-    brewfile="$(chezmoi source-path)/Brewfile"
+    brewfile="$(chezmoi source-path)/shell.Brewfile"
     if [ -f "$brewfile" ]; then
         echo "📦 Installing/Checking apps from Brewfile..."
         brew bundle --file "$brewfile" 
@@ -93,6 +93,7 @@ function install_fonts() {
         check_install_ubuntu bat
         check_install_ubuntu fzf
         check_install_ubuntu lazygit
+        check_install_ubuntu direnv
 
     {{- else if eq .chezmoi.osRelease.id "fedora" -}}
 
@@ -103,6 +104,7 @@ function install_fonts() {
         rpm-ostree install zip
         rpm-ostree install bat
         rpm-ostree install fzf
+        rpm-ostree install direnv
 
         #ghostty is in a different repo
         . /etc/os-release

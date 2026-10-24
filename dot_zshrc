@@ -39,6 +39,13 @@ zplug "junegunn/fzf", \
     hook-build: "./install --no-fish --no-bash --bin", \
     use:"shell/*.zsh"
 
+zplug "hlissner/zsh-autopair"
+zplug "supercrabtree/k"
+zplug "djui/alias-tips"
+export ZSH_PLUGINS_ALIAS_TIPS_TEXT="Alias found: "
+export ZSH_PLUGINS_ALIAS_TIPS_EXCLUDES="_ g"
+zplug "ptavares/zsh-direnv"
+
 # Install plugins if there are plugins that have not been installed
 if ! zplug check --verbose; then
     printf "Install? [y/N]: "
