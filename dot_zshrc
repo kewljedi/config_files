@@ -205,6 +205,8 @@ brx() { # run on x86_64
 }
 
 export PATH="$HOME/go/bin:$HOME/.local/bin:$HOME/bin:$PATH"
-. "$HOME/.cargo/env"
-export $XDG_CONFIG_HOME="$HOME/.config"
+if [ -f "$HOME/.cargo/env" ]; then
+  . "$HOME/.cargo/env"
+fi
+export XDG_CONFIG_HOME="$HOME/.config"
 alias bat="batcat"
