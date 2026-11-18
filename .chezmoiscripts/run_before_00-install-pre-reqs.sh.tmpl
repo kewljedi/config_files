@@ -98,22 +98,22 @@ function install_fonts() {
     {{- else if eq .chezmoi.osRelease.id "fedora" -}}
 
         echo "fedora"
-        rpm-ostree install zsh 
-        rpm-ostree install tmux
-        rpm-ostree install curl
-        rpm-ostree install zip
-        rpm-ostree install bat
-        rpm-ostree install fzf
-        rpm-ostree install direnv
+        rpm-ostree install zsh --allow-inactive
+        rpm-ostree install tmux --allow-inactive
+        rpm-ostree install curl --allow-inactive
+        rpm-ostree install zip --allow-inactive
+        rpm-ostree install bat --allow-inactive
+        rpm-ostree install fzf --allow-inactive
+        rpm-ostree install direnv --allow-inactive
 
         #ghostty is in a different repo
         . /etc/os-release
         curl -fsSL "https://copr.fedorainfracloud.org/coprs/scottames/ghostty/repo/fedora-${VERSION_ID}/scottames-ghostty-fedora-${VERSION_ID}.repo" | sudo tee /etc/yum.repos.d/_copr:copr.fedorainfracloud.org:scottames:ghostty.repo > /dev/null
-        rpm-ostree refresh-md && rpm-ostree install ghostty
+        rpm-ostree refresh-md && rpm-ostree install ghostty --allow-inactive
 
         # lazy git needs a different remote as well
         sudo ostree remote add --no-gpg-verify lazygit-copr https://fedorainfracloud.org
-        sudo rpm-ostree install lazygit
+        sudo rpm-ostree install lazygit --allow-inactive
 
         rpm-ostree ex apply-live # this should make the installs show up to this deployment
 
