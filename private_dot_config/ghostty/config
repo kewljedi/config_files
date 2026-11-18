@@ -51,3 +51,5 @@ keybind = global:ctrl+grave_accent=toggle_quick_terminal
 quick-terminal-position = top
 quick-terminal-size = 40%
 
+font-family = MartinMono Nerd Font
+font-size = 14
