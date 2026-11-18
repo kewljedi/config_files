@@ -1,13 +1,13 @@
 #!/bin/bash
 
-#{{ if eq .chezmoi.os "linux" }}
-#echo "Install for linux"
-#{{ if eq .chezmoi.osRelease.id "debian" }}
-#echo "debian"
-#apt install -y sway swaylock swayidle swaybg wofi waybar wlogout grim slurp wl-clipboard xdg-desktop-portal-wlr
-#{{ else if eq .chezmoi.osRelease.id "fedora" }}
-#echo "fedora"
-#rpm-ostree install sway swaylock swayidle swaybg wofi waybar wlogout grim slurp wl-clipboard xdg-desktop-portal-wlr
-#rpm-ostree ex apply-live # this should make the installs show up to this deployment
-#{{ end }}
-#{{ end }}
+{{ if eq .chezmoi.os "linux" }}
+  echo "Install for linux"
+  {{ if eq .chezmoi.osRelease.id "debian" }}
+    echo "debian"
+    apt install -y sway swaylock swayidle swaybg wofi waybar wlogout grim slurp wl-clipboard xdg-desktop-portal-wlr
+  {{ else if eq .chezmoi.osRelease.id "fedora" }}
+    echo "fedora"
+    rpm-ostree install sway swaylock swayidle swaybg wofi waybar wlogout grim slurp wl-clipboard xdg-desktop-portal-wlr
+    rpm-ostree ex apply-live # this should make the installs show up to this deployment
+  {{ end }}
+{{ end }}
